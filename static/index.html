@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>owo — playground · say it like you'd say it</title>
+<meta name="description" content="Live demo of owo, the Nigerian-language financial intent parser. Type in English, Pidgin, Yoruba, Hausa or Igbo and watch it become structured JSON." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="/">
+      <span class="mark">₦</span>
+      <span><b>owo</b><small>playground · v0.3</small></span>
+    </a>
+    <nav class="topbar-links">
+      <span class="live-pill" id="live-pill"><span class="live-dot"></span><span id="live-text">connecting…</span></span>
+      <a class="ghost-link" href="https://github.com/LPMatrix/owo" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div>
+      <span class="kicker">Nigerian-language financial intent parser</span>
+      <h1>Type it like you&rsquo;d <em>say it.</em></h1>
+      <p class="lede">
+        <code>owo</code> turns free-form money instructions — English, Pidgin, Yoruba, Hausa, Igbo,
+        and the code-switching in between — into structured JSON your payment backend can consume.
+        No API key needed for the offline heuristic. This demo calls the <strong>real Python package</strong>.
+      </p>
+      <div class="lang-row" id="lang-row" aria-label="Jump to a language example"></div>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#playground">Try the parser ↓</a>
+        <a class="btn btn-secondary" href="#voice">Voice input</a>
+      </div>
+    </div>
+    <aside class="hero-side">
+      <h2>Why it exists</h2>
+      <div class="stat"><b>5</b><span>languages — en · pcm · yo · ha · ig, with mid-sentence code-switching</span></div>
+      <div class="stat"><b>7</b><span>intents — transfer · bill_pay · buy_airtime · buy_data · crypto_sell · balance_check · unknown</span></div>
+      <div class="stat"><b>₦</b><span>Naija numerics — <i>5k</i>, <i>half a milli</i>, <i>dubu goma</i>, <i>₦5,000</i></span></div>
+      <p class="try-line">Try: <code>Abeg send 5k to Chidi, GTBank</code> — watch recipient + bank split apart.</p>
+    </aside>
+  </section>
+
+  <section class="playground" id="playground">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Parser playground</h2>
+        <p>Every keystroke below hits <code style="font-family:var(--mono)">POST /api/parse</code> → the real <code style="font-family:var(--mono)">owo.parse()</code>. Nothing is mocked.</p>
+      </div>
+      <div class="panel-body">
+        <label class="sr" for="input">Financial instruction</label>
+        <textarea id="input" rows="3" maxlength="500">Abeg send 5k to Chidi, GTBank</textarea>
+        <div class="input-row">
+          <button class="btn btn-parse" id="parse-btn">Parse →</button>
+          <button class="btn btn-shuffle" id="shuffle-btn" title="Random example">⚄ Surprise me</button>
+          <label class="llm-toggle"><input type="checkbox" id="use-llm" /> try LLM fallback <span style="color:var(--muted)">(needs server key)</span></label>
+        </div>
+        <div class="hint-line" id="hint">⌘/Ctrl + Enter to parse · 500 chars max</div>
+        <div class="examples">
+          <h3>One-click fixtures — verified against the real heuristic</h3>
+          <div id="examples"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel result-col">
+      <div class="panel-head">
+        <h2>Structured result</h2>
+        <p>OwoResult, rendered for humans. Raw JSON at the bottom.</p>
+      </div>
+      <div class="panel-body" id="result">
+        <div class="result-empty">
+          <p class="big">Press <b>Parse →</b></p>
+          <p>Intent, entities, per-field confidence and ambiguity flags will appear here.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="two-col">
+    <div class="panel" id="voice">
+      <div class="panel-head">
+        <h2>Voice notes → parse</h2>
+        <p>Record or upload audio. Server runs Whisper → <code style="font-family:var(--mono)">parse_audio()</code>. Without a server key, paste a transcript instead.</p>
+      </div>
+      <div class="panel-body">
+        <div class="voice-controls">
+          <button class="btn btn-secondary rec-btn" id="rec-btn"><span class="rec-dot">●</span> <span id="rec-label">Record</span></button>
+          <span class="timer" id="rec-timer"></span>
+          <label class="file-label">Upload audio <input type="file" id="audio-file" accept="audio/*" hidden /></label>
+          <select id="voice-lang" title="Language hint for Whisper">
+            <option value="">auto language</option>
+            <option value="en">English</option>
+            <option value="yo">Yoruba</option>
+            <option value="ha">Hausa</option>
+            <option value="ig">Igbo</option>
+          </select>
+        </div>
+        <div class="voice-controls" style="margin-top:10px">
+          <input id="voice-transcript" placeholder="…or paste a transcript here (no-key fallback)" style="flex:1;min-width:200px;font:inherit;padding:10px 14px;border-radius:999px;border:1.5px solid var(--line-strong);background:var(--paper)" />
+          <button class="btn btn-parse" id="voice-parse-btn" style="flex:0">Parse transcript</button>
+        </div>
+        <div class="hint-line" id="voice-hint">mic stays in your browser until you stop — only the finished clip is uploaded.</div>
+        <div class="transcript-box" id="voice-transcript-box" hidden></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>How owo thinks</h2>
+        <p>Three ideas, straight from the README.</p>
+      </div>
+      <div class="panel-body">
+        <ol class="steps">
+          <li><span class="step-n">1</span><div><b>Heuristic first, LLM only when stuck</b><p>Common patterns parse offline. Inputs outside the rule set return <code>unknown</code> + <code>needs_llm_provider</code> — the provider is called only then.</p></div></li>
+          <li><span class="step-n">2</span><div><b>Never guess — flag it</b><p><code>Send money to Tunde</code> → <code>amount: null</code> + <code>missing_amount</code>. Per-field confidence says <em>which</em> field to distrust; <code>min_confidence</code> is your go/no-go gate.</p></div></li>
+          <li><span class="step-n">3</span><div><b>Built for how Naija speaks</b><p>Code-switching, <code>5k</code>, <code>half a milli</code>, <code>dubu goma</code> — and bank splitting on <code>“, GTBank”</code>.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>owo demo · backend <code style="font-family:var(--mono)" id="foot-ver">…</code> · <a href="https://github.com/LPMatrix/owo" target="_blank" rel="noreferrer">LPMatrix/owo</a> (MIT)</span>
+    <span>heuristic runs fully offline · LLM + Whisper need <code style="font-family:var(--mono)">OPENAI_API_KEY</code></span>
+  </div>
+</footer>
+
+<script src="/assets/app.js"></script>
+</body>
+</html>
