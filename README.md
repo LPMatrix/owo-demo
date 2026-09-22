@@ -34,6 +34,31 @@ OPENAI_API_KEY=sk-... .venv/bin/uvicorn server:app --reload --port 8000
 
 Open **[http://localhost:8000](http://localhost:8000)**.
 
+## Deploy on Vercel
+
+Yes — this is already Vercel-ready. `server.py` exposes a top-level `app`
+(FastAPI entrypoint Vercel auto-detects), deps are in `requirements.txt`
+(Python 3.12 default), and the `/assets` `StaticFiles` mount gets promoted to
+Vercel's CDN. `vercel.json` sets the function timeout; `.vercelignore` keeps
+`.venv/` out of the bundle.
+
+```bash
+vercel            # preview deploy
+vercel --prod     # ship it
+```
+
+Or push to GitHub → Vercel dashboard → Import Project (zero config).
+
+Set `OPENAI_API_KEY` in the project settings (Environment Variables) to enable
+the LLM fallback + Whisper voice path. Without it, the offline heuristic and
+the transcript-paste fallback still work.
+
+Two platform limits to know:
+- **Audio uploads**: Vercel caps request bodies at ~4.5 MB on Hobby, so keep
+  voice clips short. The transcript-paste box in the UI bypasses this entirely.
+- **Cold starts**: the first hit after idle can take a few seconds (Whisper +
+  OpenAI imports are lazy, so plain parsing stays fast).
+
 ## API
 
 
