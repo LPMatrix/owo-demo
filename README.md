@@ -54,10 +54,13 @@ the LLM fallback + Whisper voice path. Without it, the offline heuristic and
 the transcript-paste fallback still work.
 
 Two platform limits to know:
+
 - **Audio uploads**: Vercel caps request bodies at ~4.5 MB on Hobby, so keep
-  voice clips short. The transcript-paste box in the UI bypasses this entirely.
+voice clips short. The transcript-paste box in the UI bypasses this entirely.
 - **Cold starts**: the first hit after idle can take a few seconds (Whisper +
-  OpenAI imports are lazy, so plain parsing stays fast).
+OpenAI imports are lazy, so plain parsing stays fast).
+
+
 
 ## API
 
@@ -76,25 +79,3 @@ curl -s localhost:8000/api/parse \
   -d '{"text":"Abeg send 5k to Chidi, GTBank"}' | python3 -m json.tool
 ```
 
-
-
-## Layout
-
-```
-owo-demo/
-├── server.py          # FastAPI: /api/* + serves static/
-├── requirements.txt
-└── static/
-    ├── index.html     # playground UI
-    ├── styles.css     # "Naija ledger" editorial theme
-    └── app.js         # fetch + render, no build step
-```
-
-
-
-## Design notes
-
-Warm paper + ink + owo green, Fraunces serif for the voice of the user,
-Space Grotesk for UI, JetBrains Mono for JSON. Confidence is always shown
-per-field (never one vague number), and the demo never fills in missing
-fields — it asks, exactly like the library does.

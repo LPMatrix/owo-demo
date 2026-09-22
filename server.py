@@ -30,7 +30,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(title="owo demo", version="0.1.0")
 
 # ---------------------------------------------------------------------------
-# Curated examples — every one verified against the real heuristic (v0.3.0).
+# Curated examples — every one verified against the real heuristic (v0.4.0).
 # The two `unknown` entries intentionally need an LLM provider.
 # ---------------------------------------------------------------------------
 
@@ -38,6 +38,11 @@ EXAMPLES = [
     {"text": "Send 20k to Mama", "lang": "en", "label": "English · shorthand", "note": "5k / 20k → thousands"},
     {"text": "Send half a milli to Kemi", "lang": "en", "label": "English · slang", "note": "half a milli = ₦500,000"},
     {"text": "Send money to Tunde", "lang": "en", "label": "English · ambiguous", "note": "missing amount → flag, not a guess"},
+    {"text": "how much is in my account", "lang": "en", "label": "English · balance", "note": "new in 0.4 — natural phrasing"},
+    {"text": "hey abeg send 20k to mama", "lang": "pcm", "label": "Pidgin · leading filler", "note": "new in 0.4 — politeness stripped first"},
+    {"text": "send mama 20k", "lang": "en", "label": "English · object-first", "note": "new in 0.4 — no 'to', scored lower"},
+    {"text": "send 20k to mama pls", "lang": "en", "label": "English · trailing filler", "note": "new in 0.4 — 'pls' trimmed off recipient"},
+    {"text": "trasfer 20k to mama", "lang": "en", "label": "English · typo", "note": "new in 0.4 — fuzzy verb correction"},
     {"text": "How much do I have?", "lang": "en", "label": "English · balance", "note": "balance_check intent"},
     {"text": "Abeg send 5k to Chidi, GTBank", "lang": "pcm", "label": "Pidgin · bank split", "note": "code-switch + ', GTBank' → bank field"},
     {"text": "Send am 5k to Ngozi", "lang": "pcm", "label": "Pidgin · send am", "note": "object-pronoun marker"},
